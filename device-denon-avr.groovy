@@ -47,7 +47,7 @@ metadata {
             state "muted", label: '${name}', action:"unmute", backgroundColor: "#79b821", icon:"st.Electronics.electronics13"
             state "unmuted", label: '${name}', action:"mute", backgroundColor: "#ffffff", icon:"st.Electronics.electronics13"
 		}
-        controlTile("level", "device.level", "slider", height: 1, width: 2, inactiveLabel: false, range: "(-80..10)") {
+        controlTile("level", "device.level", "slider", height: 1, width: 2, inactiveLabel: false, range: "(0..90)") {
 			state "level", label: '${name}', action:"setLevel"
 		}
         
@@ -119,7 +119,7 @@ def parse(String description) {
     
     if(statusrsp.MasterVolume.value.text()) { 
     	def float volLevel = statusrsp.MasterVolume.value.toFloat() ?: -40.0
-        log.debug "VOL: $volLevel" 
+        log.debug "VOL in dB: $volLevel" 
    		def int curLevel = -40.0
         try {
         	curLevel = device.currentValue("level")
@@ -127,6 +127,7 @@ def parse(String description) {
         	curLevel = -40.0
         }
         if(curLevel != volLevel) {
+        	volLevel = volLevel + 80.0
     		sendEvent(name: "level", value: volLevel)
         }
     } 
@@ -134,8 +135,9 @@ def parse(String description) {
 
 
 def setLevel(val) {
+	val = val - 80
 	sendEvent(name: "mute", value: "unmuted")     
-    sendEvent(name: "level", value: val)
+    	sendEvent(name: "level", value: val)
     
     request("cmd0=PutMasterVolumeSet%2F$val")
 }
