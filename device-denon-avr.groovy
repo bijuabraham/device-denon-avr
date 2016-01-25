@@ -86,12 +86,11 @@ def parse(String description) {
 	    sendEvent(name: "mute", value: 'unmuted')
     }
     
-	def inputCanonical = statusrsp.InputFuncSelect.value.text()
+	def inputCanonical = statusrsp.VideoSelectLists.value.text()
     def inputTmp = []
     //check to see if the VideoSelectLists node is available
     if(!statusrsp.VideoSelectLists.isEmpty()){
-    	log.debug "VideoSelectLists is available... parsing"
-        log.debug statusrsp.VideoSelectLists
+    	log.debug "VideoSelectLists is available... parsing..."
         statusrsp.VideoSelectLists.value.each {
             if(it.@index != "ON" && it.@index != "OFF") {
                 inputTmp.push(it.'@index')
